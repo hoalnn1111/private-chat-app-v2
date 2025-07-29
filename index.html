@@ -1,0 +1,426 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Chat Riêng Tư - 3 Người Bạn</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .container {
+            background: white;
+            border-radius: 20px;
+            box-shadow: 0 20px 40px rgba(0,0,0,0.1);
+            width: 90%;
+            max-width: 800px;
+            height: 90vh;
+            max-height: 600px;
+            display: flex;
+            flex-direction: column;
+            overflow: hidden;
+        }
+
+        .header {
+            background: linear-gradient(135deg, #4facfe 0%, #00f2fe 100%);
+            color: white;
+            padding: 20px;
+            text-align: center;
+            position: relative;
+        }
+
+        .header h1 {
+            margin: 0;
+            font-size: 1.5em;
+            font-weight: 600;
+        }
+
+        .user-setup {
+            padding: 30px;
+            text-align: center;
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+        }
+
+        .user-setup input {
+            padding: 15px;
+            border: 2px solid #e1e8ed;
+            border-radius: 25px;
+            font-size: 16px;
+            margin: 10px;
+            outline: none;
+            transition: all 0.3s ease;
+        }
+
+        .user-setup input:focus {
+            border-color: #4facfe;
+            box-shadow: 0 0 0 3px rgba(79, 172, 254, 0.1);
+        }
+
+        .user-setup button {
+            background: linear-gradient(135deg, #4facfe 0%, #00f2fe 100%);
+            color: white;
+            border: none;
+            padding: 15px 30px;
+            border-radius: 25px;
+            font-size: 16px;
+            cursor: pointer;
+            margin: 10px;
+            transition: transform 0.2s ease;
+        }
+
+        .user-setup button:hover {
+            transform: translateY(-2px);
+        }
+
+        .chat-area {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            display: none;
+        }
+
+        .messages {
+            flex: 1;
+            padding: 15px;
+            overflow-y: auto;
+            background: #ffffff;
+        }
+
+        .message-group {
+            margin: 8px 0;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .message-group.own {
+            align-items: flex-end;
+        }
+
+        .message-group.other {
+            align-items: flex-start;
+        }
+
+        .message {
+            max-width: 65%;
+            margin: 2px 0;
+            word-wrap: break-word;
+            animation: slideIn 0.3s ease;
+            position: relative;
+        }
+
+        @keyframes slideIn {
+            from {
+                opacity: 0;
+                transform: translateY(10px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .message-bubble {
+            padding: 8px 12px;
+            border-radius: 18px;
+            font-size: 16px;
+            line-height: 1.4;
+        }
+
+        .message.own .message-bubble {
+            background: #007AFF;
+            color: white;
+            border-bottom-right-radius: 4px;
+        }
+
+        .message.other .message-bubble {
+            background: #E5E5EA;
+            color: #000;
+            border-bottom-left-radius: 4px;
+        }
+
+        .message-header {
+            font-size: 12px;
+            color: #8E8E93;
+            margin-bottom: 4px;
+            margin-left: 12px;
+            font-weight: 500;
+        }
+
+        .message.own .message-header {
+            margin-left: 0;
+            margin-right: 12px;
+            text-align: right;
+        }
+
+        .message-time {
+            font-size: 11px;
+            color: #8E8E93;
+            margin-top: 2px;
+            margin-left: 12px;
+        }
+
+        .message.own .message-time {
+            margin-left: 0;
+            margin-right: 12px;
+            text-align: right;
+        }
+
+        .consecutive {
+            margin-top: 1px;
+        }
+
+        .input-area {
+            padding: 20px;
+            background: white;
+            border-top: 1px solid #e1e8ed;
+            display: flex;
+            gap: 10px;
+        }
+
+        .input-area input {
+            flex: 1;
+            padding: 12px 20px;
+            border: 2px solid #e1e8ed;
+            border-radius: 25px;
+            font-size: 16px;
+            outline: none;
+            transition: all 0.3s ease;
+        }
+
+        .input-area input:focus {
+            border-color: #4facfe;
+        }
+
+        .input-area button {
+            background: linear-gradient(135deg, #4facfe 0%, #00f2fe 100%);
+            color: white;
+            border: none;
+            padding: 12px 20px;
+            border-radius: 25px;
+            cursor: pointer;
+            transition: transform 0.2s ease;
+        }
+
+        .input-area button:hover {
+            transform: scale(1.05);
+        }
+
+        .online-users {
+            background: rgba(255,255,255,0.2);
+            padding: 10px;
+            border-radius: 10px;
+            margin-top: 10px;
+            font-size: 0.9em;
+        }
+
+        .status-indicator {
+            display: inline-block;
+            width: 8px;
+            height: 8px;
+            background: #4CAF50;
+            border-radius: 50%;
+            margin-right: 5px;
+            animation: pulse 2s infinite;
+        }
+
+        @keyframes pulse {
+            0% { transform: scale(1); opacity: 1; }
+            50% { transform: scale(1.1); opacity: 0.7; }
+            100% { transform: scale(1); opacity: 1; }
+        }
+
+        @media (max-width: 600px) {
+            .container {
+                width: 95%;
+                height: 95vh;
+                border-radius: 10px;
+            }
+            
+            .message {
+                max-width: 85%;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>💬 Chat Riêng Tư</h1>
+            <div class="online-users" id="onlineUsers" style="display: none;">
+                <span class="status-indicator"></span>
+                <span id="userCount">1 người online</span>
+            </div>
+        </div>
+
+        <div class="user-setup" id="userSetup">
+            <h2>Chào mừng đến với phòng chat riêng!</h2>
+            <p>Nhập tên của bạn để bắt đầu trò chuyện</p>
+            <input type="text" id="usernameInput" placeholder="Tên của bạn..." maxlength="20">
+            <button onclick="joinChat()">Tham Gia Chat</button>
+        </div>
+
+        <div class="chat-area" id="chatArea">
+            <div class="messages" id="messages"></div>
+            <div class="input-area">
+                <input type="text" id="messageInput" placeholder="Nhập tin nhắn..." maxlength="500">
+                <button onclick="sendMessage()">Gửi</button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        let currentUser = '';
+        let messages = [];
+        let users = [];
+
+        function joinChat() {
+            const username = document.getElementById('usernameInput').value.trim();
+            if (username) {
+                currentUser = username;
+                
+                // Thêm user vào danh sách nếu chưa có
+                if (!users.includes(username)) {
+                    users.push(username);
+                }
+                
+                // Hiển thị chat area
+                document.getElementById('userSetup').style.display = 'none';
+                document.getElementById('chatArea').style.display = 'flex';
+                document.getElementById('onlineUsers').style.display = 'block';
+                
+                updateUserCount();
+                
+                // Thêm tin nhắn hệ thống
+                addSystemMessage(`${username} đã tham gia phòng chat`);
+                
+                // Focus vào input
+                document.getElementById('messageInput').focus();
+            }
+        }
+
+        function sendMessage() {
+            const messageInput = document.getElementById('messageInput');
+            const messageText = messageInput.value.trim();
+            
+            if (messageText && currentUser) {
+                const message = {
+                    id: Date.now(),
+                    user: currentUser,
+                    text: messageText,
+                    time: new Date()
+                };
+                
+                messages.push(message);
+                displayMessage(message);
+                messageInput.value = '';
+                
+                // Scroll xuống cuối
+                const messagesContainer = document.getElementById('messages');
+                messagesContainer.scrollTop = messagesContainer.scrollHeight;
+            }
+        }
+
+        function displayMessage(message) {
+            const messagesContainer = document.getElementById('messages');
+            const isOwnMessage = message.user === currentUser;
+            
+            // Kiểm tra xem có phải tin nhắn liên tiếp từ cùng người không
+            const lastMessage = messagesContainer.lastElementChild;
+            const isConsecutive = lastMessage && 
+                                 lastMessage.classList.contains('message-group') &&
+                                 ((isOwnMessage && lastMessage.classList.contains('own')) ||
+                                  (!isOwnMessage && lastMessage.classList.contains('other')));
+            
+            let messageGroup;
+            
+            if (isConsecutive) {
+                // Thêm vào group hiện tại
+                messageGroup = lastMessage;
+            } else {
+                // Tạo group mới
+                messageGroup = document.createElement('div');
+                messageGroup.className = `message-group ${isOwnMessage ? 'own' : 'other'}`;
+                
+                // Thêm header nếu không phải tin nhắn của mình
+                if (!isOwnMessage) {
+                    const headerDiv = document.createElement('div');
+                    headerDiv.className = 'message-header';
+                    headerDiv.textContent = message.user;
+                    messageGroup.appendChild(headerDiv);
+                }
+                
+                messagesContainer.appendChild(messageGroup);
+            }
+            
+            // Tạo tin nhắn
+            const messageDiv = document.createElement('div');
+            messageDiv.className = `message ${isOwnMessage ? 'own' : 'other'}`;
+            
+            const timeString = message.time.toLocaleTimeString('vi-VN', {
+                hour: '2-digit',
+                minute: '2-digit'
+            });
+            
+            messageDiv.innerHTML = `
+                <div class="message-bubble">${message.text}</div>
+                <div class="message-time">${timeString}</div>
+            `;
+            
+            messageGroup.appendChild(messageDiv);
+        }
+
+        function addSystemMessage(text) {
+            const messagesContainer = document.getElementById('messages');
+            const messageDiv = document.createElement('div');
+            messageDiv.style.textAlign = 'center';
+            messageDiv.style.color = '#666';
+            messageDiv.style.fontSize = '0.9em';
+            messageDiv.style.margin = '10px 0';
+            messageDiv.style.fontStyle = 'italic';
+            messageDiv.textContent = text;
+            messagesContainer.appendChild(messageDiv);
+        }
+
+        function updateUserCount() {
+            const userCountSpan = document.getElementById('userCount');
+            const count = users.length;
+            userCountSpan.textContent = `${count} người online`;
+        }
+
+        // Event listeners
+        document.getElementById('usernameInput').addEventListener('keypress', function(e) {
+            if (e.key === 'Enter') {
+                joinChat();
+            }
+        });
+
+        document.getElementById('messageInput').addEventListener('keypress', function(e) {
+            if (e.key === 'Enter') {
+                sendMessage();
+            }
+        });
+
+        // Thêm một số tin nhắn mẫu để demo
+        setTimeout(() => {
+            if (currentUser) {
+                addSystemMessage('Chào mừng bạn đến với phòng chat! Mời hai người bạn khác tham gia bằng cách chia sẻ liên kết này.');
+            }
+        }, 1000);
+    </script>
+</body>
+</html>
